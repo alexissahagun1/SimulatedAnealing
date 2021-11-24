@@ -73,10 +73,11 @@ for i in range(len(nodeCoordinates)):
     xCoordinates.append(nodeCoordinates[i][0])
     yCoordinates.append(nodeCoordinates[i][1])
 
-temp = 1000
-iterations = 100000
-tempDrop = 0.01
-tempChange = 50
+temp = 2800
+iterations = 2000000
+tempDrop = 0.001
+tempChange = 80
+
 
 error = 1e-3  # delta para el ultimo paso (quenching step)
 
