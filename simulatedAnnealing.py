@@ -88,38 +88,36 @@ currPathCost = getPathCost(currPath)
 costs = []
 costs.append(currPathCost)
 for i in range(iterations):
-    newPath = getNewPath(currPath)
-    newPathCost = getPathCost(newPath)
+    i = random.randint(0, len(graph) - 1)
+    j = random.randint(0, len(graph) - 1)
+    currPath[i], currPath[j] = currPath[j], currPath[i]
+    newPathCost = getPathCost(currPath)
 
-    if(newPathCost < currPathCost):
+    delta = newPathCost - currPathCost
+
+    if(delta <= 0 or math.exp(-delta / temp) > random.random()):
         # si la ruta es mejor:
-        currPath = newPath
         currPathCost = newPathCost
     else:
-        # si la ruta es peor:
-        delta = newPathCost - currPathCost
-
-        if(math.exp(-delta / temp) > random.random()):
-            currPath = newPath
-            currPathCost = newPathCost
+        currPath[i], currPath[j] = currPath[j], currPath[i]
 
     costs.append(currPathCost)
     temp = temp * (1-tempDrop)
-    for i in range(len(currPath) - 1):
-        # Line from node i to node i + 1
-        xValues = [xCoordinates[currPath[i]], xCoordinates[currPath[i+1]]]
-        yValues = [yCoordinates[currPath[i]], yCoordinates[currPath[i+1]]]
-        plt.plot(xValues, yValues)
-    # Line froma last to first node
-    xValues = [
-        xCoordinates[currPath[len(currPath) - 1]], xCoordinates[currPath[0]]]
-    yValues = [
-        yCoordinates[currPath[len(currPath) - 1]], yCoordinates[currPath[0]]]
-    plt.plot(xValues, yValues)
+    # for i in range(len(currPath) - 1):
+    #     # Line from node i to node i + 1
+    #     xValues = [xCoordinates[currPath[i]], xCoordinates[currPath[i+1]]]
+    #     yValues = [yCoordinates[currPath[i]], yCoordinates[currPath[i+1]]]
+    #     plt.plot(xValues, yValues)
+    # # Line froma last to first node
+    # xValues = [
+    #     xCoordinates[currPath[len(currPath) - 1]], xCoordinates[currPath[0]]]
+    # yValues = [
+    #     yCoordinates[currPath[len(currPath) - 1]], yCoordinates[currPath[0]]]
+    # plt.plot(xValues, yValues)
 
-    plt.scatter(xCoordinates, yCoordinates)
-    plt.pause(0.001)
-    plt.clf()
+    # plt.scatter(xCoordinates, yCoordinates)
+    # plt.pause(0.001)
+    # plt.clf()
 
 
 # plt.show()
@@ -127,7 +125,7 @@ for i in range(iterations):
 costIteration = range((iterations+1))
 
 plt.plot(costIteration, costs)
-# plt.show()
+plt.show()
 
 plotPath(currPath, xCoordinates, yCoordinates)
 
