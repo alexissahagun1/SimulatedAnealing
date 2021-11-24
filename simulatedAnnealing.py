@@ -74,8 +74,10 @@ for i in range(len(nodeCoordinates)):
     yCoordinates.append(nodeCoordinates[i][1])
 
 temp = 1000
-iterations = 200000
-tempDrop = 0.001
+iterations = 100000
+tempDrop = 0.01
+tempChange = 50
+
 error = 1e-3  # delta para el ultimo paso (quenching step)
 
 # obtener camino inicial
@@ -102,7 +104,10 @@ for i in range(iterations):
         currPath[i], currPath[j] = currPath[j], currPath[i]
 
     costs.append(currPathCost)
-    temp = temp * (1-tempDrop)
+
+    if (i % tempChange == 0):
+        temp *= (1-tempDrop)
+
     # for i in range(len(currPath) - 1):
     #     # Line from node i to node i + 1
     #     xValues = [xCoordinates[currPath[i]], xCoordinates[currPath[i+1]]]
