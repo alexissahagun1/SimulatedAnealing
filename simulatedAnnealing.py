@@ -74,7 +74,7 @@ for i in range(len(nodeCoordinates)):
     yCoordinates.append(nodeCoordinates[i][1])
 
 temp = 2800
-iterations = 2000000
+iterations = 250000
 tempDrop = 0.001
 tempChange = 80
 
