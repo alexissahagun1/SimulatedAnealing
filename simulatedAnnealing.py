@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 import math
+from copy import deepcopy
 
 # Leer archivo csv y guradar sus conetinidos dentro de un array
 
@@ -45,18 +46,55 @@ def plotPath(path, xCoordinates, yCoordinates):
     plt.scatter(xCoordinates, yCoordinates)
     plt.show()
 
-# neighbor
+
+def simulatedAnnealing(temp, iterations, tempDrop, tempChange, costs, currPath, currPathCost, graph):
+    error = 1e-3  # delta para el ultimo paso (quenching step)
+
+    # main loop
+    costs.append(currPathCost)
+    for i in range(iterations):
+        i = random.randint(0, len(graph) - 1)
+        j = random.randint(0, len(graph) - 1)
+        currPath[i], currPath[j] = currPath[j], currPath[i]
+        newPathCost = getPathCost(currPath)
+
+        delta = newPathCost - currPathCost
+
+        if(delta <= 0 or math.exp(-delta / temp) > random.random()):
+            # si la ruta es mejor:
+            currPathCost = newPathCost
+        else:
+            currPath[i], currPath[j] = currPath[j], currPath[i]
+
+        costs.append(currPathCost)
+
+        if (i % tempChange == 0):
+            temp *= (1-tempDrop)
 
 
-def getNewPath(path):
-    randIndex1 = random.randint(0, len(path)-1)
-    randIndex2 = random.randint(0, len(path)-1)
+def findValues(testValue, graph):
+    bestValues = [[1000000 for col in range(4)] for row in range(10)]
+    tempValues = np.random.normal(10000, 1000, size=(testValue))
+    tempDrops = np.random.normal(0.002, 0.0005, size=(testValue))
+    iterations = 200000
+    tempChanges = np.random.normal(120, 20, size=(testValue))
+    currPath = range(len(graph))
+    currPath = np.random.permutation(currPath)
+    currPathCost = getPathCost(currPath)
 
-    temp = path[randIndex1]
-    path[randIndex1] = path[randIndex2]
-    path[randIndex2] = temp
-
-    return path
+    for i in range(testValue):
+        costs = []
+        simulatedAnnealing(deepcopy(tempValues[i]), iterations, deepcopy(tempDrops[i]), deepcopy(tempChanges[i]),
+                           costs, deepcopy(currPath), deepcopy(currPathCost), graph)
+        minCost = costs[-1]
+        for i in range(10):
+            if (minCost < bestValues[i][0]):
+                bestValues[i][0] = minCost
+                bestValues[i][1] = tempValues[i]
+                bestValues[i][2] = tempDrops[i]
+                bestValues[i][3] = tempChanges[i]
+                break
+    return bestValues
 
 
 # MAIN CODE
@@ -73,66 +111,43 @@ for i in range(len(nodeCoordinates)):
     xCoordinates.append(nodeCoordinates[i][0])
     yCoordinates.append(nodeCoordinates[i][1])
 
-temp = 1000
-iterations = 100000
-tempDrop = 0.01
-tempChange = 50
 
-error = 1e-3  # delta para el ultimo paso (quenching step)
+tabla = findValues(10, graph)
+print(tabla)
 
-# obtener camino inicial
-currPath = range(len(graph))
-currPath = np.random.permutation(currPath)
-
-currPathCost = getPathCost(currPath)
-
-# main loop
-costs = []
-costs.append(currPathCost)
-for i in range(iterations):
-    i = random.randint(0, len(graph) - 1)
-    j = random.randint(0, len(graph) - 1)
-    currPath[i], currPath[j] = currPath[j], currPath[i]
-    newPathCost = getPathCost(currPath)
-
-    delta = newPathCost - currPathCost
-
-    if(delta <= 0 or math.exp(-delta / temp) > random.random()):
-        # si la ruta es mejor:
-        currPathCost = newPathCost
-    else:
-        currPath[i], currPath[j] = currPath[j], currPath[i]
-
-    costs.append(currPathCost)
-
-    if (i % tempChange == 0):
-        temp *= (1-tempDrop)
-
-    # for i in range(len(currPath) - 1):
-    #     # Line from node i to node i + 1
-    #     xValues = [xCoordinates[currPath[i]], xCoordinates[currPath[i+1]]]
-    #     yValues = [yCoordinates[currPath[i]], yCoordinates[currPath[i+1]]]
-    #     plt.plot(xValues, yValues)
-    # # Line froma last to first node
-    # xValues = [
-    #     xCoordinates[currPath[len(currPath) - 1]], xCoordinates[currPath[0]]]
-    # yValues = [
-    #     yCoordinates[currPath[len(currPath) - 1]], yCoordinates[currPath[0]]]
-    # plt.plot(xValues, yValues)
-
-    # plt.scatter(xCoordinates, yCoordinates)
-    # plt.pause(0.001)
-    # plt.clf()
+# Definir un camino incial y su costo
+# currPath = range(len(graph))
+# currPath = np.random.permutation(currPath)
+# currPathCost = getPathCost(currPath)
+# costs = []
+# temp = 10000
+# iterations = 200000
+# tempDrop = 0.0022
+# tempChange = 120
+# simulatedAnnealing(temp, iterations, tempDrop, tempChange,
+#                    costs, currPath, currPathCost, graph)
 
 
+# for i in range(len(currPath) - 1):
+#     # Line from node i to node i + 1
+#     xValues = [xCoordinates[currPath[i]], xCoordinates[currPath[i+1]]]
+#     yValues = [yCoordinates[currPath[i]], yCoordinates[currPath[i+1]]]
+#     plt.plot(xValues, yValues)
+# # Line froma last to first node
+# xValues = [
+#     xCoordinates[currPath[len(currPath) - 1]], xCoordinates[currPath[0]]]
+# yValues = [
+#     yCoordinates[currPath[len(currPath) - 1]], yCoordinates[currPath[0]]]
+# plt.plot(xValues, yValues)
+
+# plt.scatter(xCoordinates, yCoordinates)
+# plt.pause(0.001)
+# plt.clf()
+
+# costIteration = range((iterations+1))
+
+# plt.plot(costIteration, costs, label="Costo: " + str(costs[-1]))
+# plt.legend(loc="upper left")
 # plt.show()
 
-costIteration = range((iterations+1))
-
-plt.plot(costIteration, costs)
-plt.show()
-
-plotPath(currPath, xCoordinates, yCoordinates)
-
-# i va de 1-10
-# intercambiar dos ciudades random
+# plotPath(currPath, xCoordinates, yCoordinates)
