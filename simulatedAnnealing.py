@@ -89,10 +89,14 @@ def findValues(testValue, graph):
         minCost = costs[-1]
         for i in range(10):
             if (minCost < bestValues[i][0]):
-                bestValues[i][0] = minCost
-                bestValues[i][1] = tempValues[i]
-                bestValues[i][2] = tempDrops[i]
-                bestValues[i][3] = tempChanges[i]
+                value = []
+                value.append(minCost)
+                value.append(tempValues[i])
+                value.append(tempDrops[i])
+                value.append(tempChanges[i])
+                bestValues.insert(i, value)
+                del bestValues[-1]
+
                 break
     return bestValues
 
